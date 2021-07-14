@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:uni_links2/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'stripe_api.dart';
@@ -175,22 +174,7 @@ class Stripe {
   Future<Map<String, dynamic>> _authenticateIntent(Map action, IntentProvider callback) async {
     final String url = action['redirect_to_url']['url'];
     final completer = Completer<Map<String, dynamic>>();
-    if (!kIsWeb) {
-      final returnUrl = Uri.parse(action['redirect_to_url']['return_url']);
-      late StreamSubscription sub;
-      sub = uriLinkStream.listen((Uri? uri) async {
-        if (uri != null &&
-            uri.scheme == returnUrl.scheme &&
-            uri.host == returnUrl.host &&
-            uri.queryParameters['requestId'] == returnUrl.queryParameters['requestId']) {
-          await sub.cancel();
-          final intent = await callback(uri);
-          completer.complete(intent);
-        }
-      });
-    } else {
-      completer.complete({});
-    }
+    completer.complete({});
 
     await launch(url, webOnlyWindowName: '_self', forceSafariVC: false);
     return completer.future;
